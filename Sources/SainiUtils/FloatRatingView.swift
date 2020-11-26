@@ -7,7 +7,7 @@
 //
 
 import UIKit
-
+import Foundation
 @objc public protocol FloatRatingViewDelegate {
     /// Returns the rating value when touch events end
     @objc optional func floatRatingView(_ ratingView: FloatRatingView, didUpdate rating: Double)

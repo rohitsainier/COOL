@@ -7,7 +7,7 @@
 //
 
 import Foundation
-
+import UIKit
 
 //MARK:- DispatchQueueHelper
 public class DispatchQueueHelper {

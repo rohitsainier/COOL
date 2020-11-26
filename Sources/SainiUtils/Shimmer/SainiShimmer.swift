@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 //MARK:- SainiShimmer
 open class SainiShimmer{

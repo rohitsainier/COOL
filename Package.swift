@@ -7,10 +7,7 @@ let package = Package(
     name: "SainiUtils",
     platforms: [
         // Add support for all platforms starting from a specific version.
-        .macOS(.v10_15),
-        .iOS(.v11),
-        .watchOS(.v5),
-        .tvOS(.v11)
+        .iOS(.v11)
     ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
