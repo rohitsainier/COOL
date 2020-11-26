@@ -6,7 +6,7 @@ final class SainiUtilsTests: XCTestCase {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
-        XCTAssertEqual(SainiUtils().text, "Hello, World!")
+        XCTAssertEqual(SainiUtils().text, "COOL, SAINISAAB!")
     }
 
     static var allTests = [
