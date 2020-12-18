@@ -12,89 +12,97 @@ import CoreLocation
 
 open class SainiLocationManager: NSObject {
     
+    //MARK:- variable
+    public static var shared:SainiLocationManager = {
+       return SainiLocationManager()
+    }()
     
-    // - public
-    public let locationManager = CLLocationManager()
+    public var clManager: CLLocationManager!
+    public var currentLocation:BoxBind<AppLocation?> = BoxBind(nil)
+    public var currentCity:BoxBind<String?> = BoxBind(nil)
+    public var currentCountry:BoxBind<String?> = BoxBind(nil)
+    public var currentCountryCode:BoxBind<String?> = BoxBind(nil)
     
-    
-    // - API
-    public var exposedLocation: CLLocation? {
-        return self.locationManager.location
-    }
-    
+    //MARK:- initializers
     public override init() {
         super.init()
-        self.locationManager.delegate = self
-        self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        self.locationManager.requestWhenInUseAuthorization()
+        clManager = CLLocationManager()
+        clManager.delegate = self
+    }
+    
+    //MARK:- functions
+    public func requestPermissionIfRequired(){
+        clManager.desiredAccuracy = kCLLocationAccuracyBest
+        clManager.requestWhenInUseAuthorization()
     }
 }
 
 
-// MARK: - Core Location Delegate
+//MARK:- Core Location Delegate
 extension SainiLocationManager: CLLocationManagerDelegate {
-    
-    
     public func locationManager(_ manager: CLLocationManager,
-                         didChangeAuthorization status: CLAuthorizationStatus) {
-
+                                didChangeAuthorization status: CLAuthorizationStatus) {
+        
         switch status {
-    
-        case .notDetermined         : log.error("notDetermined")/        // location permission not asked for yet
-        case .authorizedWhenInUse   : log.success("authorizedWhenInUse")/  // location authorized
-        case .authorizedAlways      : log.success("authorizedAlways")/     // location authorized
-        case .restricted            : log.error("restricted")/           // TODO: handle
-        case .denied                : log.error("denied")/               // TODO: handle
+        case .notDetermined,.restricted,.denied:
+            log.error("Location access blocked")/
+        case .authorizedWhenInUse,.authorizedAlways:
+            log.error("Location permission granted")/
+            getLocationForUser(location: manager.location)
         @unknown default:
-            fatalError()
+            break
         }
     }
-}
-
-// MARK: - Get Placemark
-extension SainiLocationManager {
     
-    
-    public func getPlace(for location: CLLocation,
-                  completion: @escaping (CLPlacemark?) -> Void) {
+    private func getLocationForUser(location:CLLocation?){
+        guard let location = location else {return}
         
         let geocoder = CLGeocoder()
-        geocoder.reverseGeocodeLocation(location) { placemarks, error in
-            
-            guard error == nil else {
-                print("*** Error in \(#function): \(error!.localizedDescription)")
-                completion(nil)
-                return
+        geocoder.reverseGeocodeLocation(location,preferredLocale: .current){ [self] (placemarks, error) in
+            if error == nil{
+                guard let placemarks = placemarks else {return}
+                let placemark = placemarks[0]
+                let appLocation = AppLocation(latitude: placemark.location?.coordinate.latitude ?? 0, longitude: placemark.location?.coordinate.longitude ?? 0)
+                currentLocation.value = appLocation
+                currentCity.value = placemark.locality
+                currentCountry.value = placemark.country
+                currentCountryCode.value = placemark.isoCountryCode
             }
-            
-            guard let placemark = placemarks?[0] else {
-                print("*** Error in \(#function): placemark is nil")
-                completion(nil)
-                return
+            else{
+                log.error("Error while decoding current location")/
             }
-            
-            completion(placemark)
+        }
+        
+    }
+}
+
+//Listener
+open class BoxBind<T>{
+    public typealias Listener = (T) -> ()
+    
+    //MARK:- variable
+    public var value: T{
+        didSet{
+            listener?(value)
         }
     }
     
-    public func getCoordinateFrom(address: String, completion: @escaping(_ coordinate: CLLocationCoordinate2D?, _ error: Error?) -> () ) {
-        CLGeocoder().geocodeAddressString(address) { completion($0?.first?.location?.coordinate, $1) }
+    public var listener:Listener?
+    
+    //MARK:- initializers
+    init(_ value:T){
+        self.value = value
     }
     
-    public func getCoordinate( addressString : String,
-            completionHandler: @escaping(CLLocationCoordinate2D, NSError?) -> Void ) {
-        let geocoder = CLGeocoder()
-        geocoder.geocodeAddressString(addressString) { (placemarks, error) in
-            if error == nil {
-                if let placemark = placemarks?[0] {
-                    let location = placemark.location!
-                        
-                    completionHandler(location.coordinate, nil)
-                    return
-                }
-            }
-                
-            completionHandler(kCLLocationCoordinate2DInvalid, error as NSError?)
-        }
+    //MARK:- functions
+    public func bind(listener: Listener?){
+        self.listener = listener
+        listener?(value)
     }
+}
+
+//MARK:- AppLocation
+public struct AppLocation {
+    var latitude:CLLocationDegrees
+    var longitude:CLLocationDegrees
 }
