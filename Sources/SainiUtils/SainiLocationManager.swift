@@ -58,15 +58,16 @@ extension SainiLocationManager: CLLocationManagerDelegate {
         guard let location = location else {return}
         
         let geocoder = CLGeocoder()
-        geocoder.reverseGeocodeLocation(location,preferredLocale: .current){ [self] (placemarks, error) in
+        geocoder.reverseGeocodeLocation(location,preferredLocale: .current){ [weak self] (placemarks, error) in
+            guard let `self` = self else{return}
             if error == nil{
                 guard let placemarks = placemarks else {return}
                 let placemark = placemarks[0]
                 let appLocation = AppLocation(latitude: placemark.location?.coordinate.latitude ?? 0, longitude: placemark.location?.coordinate.longitude ?? 0)
-                currentLocation.value = appLocation
-                currentCity.value = placemark.locality
-                currentCountry.value = placemark.country
-                currentCountryCode.value = placemark.isoCountryCode
+                self.currentLocation.value = appLocation
+                self.currentCity.value = placemark.locality
+                self.currentCountry.value = placemark.country
+                self.currentCountryCode.value = placemark.isoCountryCode
             }
             else{
                 log.error("Error while decoding current location")/
