@@ -59,6 +59,16 @@ extension UIView{
         self.addSubview(blurEffectView)
     }//2
     
+    //MARK:- sainiSaabBlur
+    func sainiSaabBlur(blurValue:CGFloat){
+      let visualEffectView = VisualEffectView(frame: CGRect(x: 0, y: 0, width: self.bounds.width, height: self.bounds.height))
+      // Configure the view with tint color, blur radius, etc
+      visualEffectView.colorTint = .clear
+      visualEffectView.blurRadius = blurValue
+      visualEffectView.scale = 1
+      self.addSubview(visualEffectView)
+    }
+    
     //MARK:- sainiGradientColor
     public func sainiGradientColor(colorArr: [CGColor],vertical: Bool){
         let layer : CAGradientLayer = CAGradientLayer()
