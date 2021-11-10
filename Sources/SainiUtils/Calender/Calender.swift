@@ -48,7 +48,7 @@ public func getEventsFromCalendar(completion: @escaping (_ events: [EKEvent]) ->
 }
 
 //MARK: - Delete event from calendar by title
-func deleteEventFromCalendar(title: String, completion: @escaping (_ success: Bool) -> Void) {
+public func deleteEventFromCalendar(title: String, completion: @escaping (_ success: Bool) -> Void) {
     let eventStore = EKEventStore()
     eventStore.requestAccess(to: .event) { (granted, error) in
         if (granted) && (error == nil) {
@@ -70,7 +70,7 @@ func deleteEventFromCalendar(title: String, completion: @escaping (_ success: Bo
 }
 
 //MARK: - Update event in calendar by title
-func updateEventInCalendar(title: String, description: String, startDate: Date, endDate: Date, completion: @escaping (_ success: Bool) -> Void) {
+public func updateEventInCalendar(title: String, description: String, startDate: Date, endDate: Date, completion: @escaping (_ success: Bool) -> Void) {
     let eventStore = EKEventStore()
     eventStore.requestAccess(to: .event) { (granted, error) in
         if (granted) && (error == nil) {
