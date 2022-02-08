@@ -3,7 +3,7 @@
 import UIKit
 import QuartzCore
 
-public protocol MYCircularSliderProtocol: class {
+public protocol MYCircularSliderProtocol: AnyObject {
     // Acts as an abstract class only - not to be used
 }
 
