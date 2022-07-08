@@ -19,6 +19,11 @@ public enum LogDateFormatter: String {
     case MMM_d_HH_mm_ss_SSSZ = "MMM d, HH:mm:ss:SSSZ"
 }
 
+public enum LogAlignFormatter: String {
+    case symbolEqualTo = "========================================"
+    case nextLine = "\n\n"
+}
+
 public struct LogOptions {
     static var dateFormatter = LogDateFormatter.MMM_d_HH_mm_ss_SSSZ
 }
@@ -52,6 +57,7 @@ public enum log {
     case result(_:String)
     case push(_:String)
     case validationFailed(_:String)
+    case custom(_ start: String, _ end: String, _:String)
 }
 
 postfix operator /
@@ -68,6 +74,25 @@ public postfix func / (target: log?) {
         //#if DEBUG
         print(emoji + " " + String(describing: object))
         //#endif
+     }
+  func customLog<T>(_ start: String,_ end: String, _ object: T) {
+     // To enable logs only in Debug mode:
+     // 1. Go to Buld Settings -> Other C Flags
+     // 2. Enter `-D DEBUG` fot the Debug flag
+     // 3. Comment out the `#if #endif` lines
+     // 4. Celebrate. Your logs will not print in Release, thus saving on memory
+     //#if DEBUG
+    print(LogAlignFormatter.symbolEqualTo.rawValue +
+          " \(start) " +
+          LogAlignFormatter.symbolEqualTo.rawValue +
+          LogAlignFormatter.nextLine.rawValue +
+          String(describing: object) +
+          LogAlignFormatter.nextLine.rawValue +
+          LogAlignFormatter.symbolEqualTo.rawValue +
+          " \(end) " +
+          LogAlignFormatter.symbolEqualTo.rawValue +
+          LogAlignFormatter.nextLine.rawValue)
+     //#endif
     }
     
     switch target {
@@ -93,6 +118,8 @@ public postfix func / (target: log?) {
         log("👉", push)
     case .validationFailed(let validation):
         log("⛑", validation)
+    case .custom(let start, let end, let message):
+      customLog(start, end, message)
     }
 }
 //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
