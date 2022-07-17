@@ -9,7 +9,6 @@ import Foundation
 import UIKit
 
 extension Encodable {
-  
   //MARK:-  Converting object to postable JSON
   public func toJSON(_ encoder: JSONEncoder = JSONEncoder()) -> [String: Any] {
     guard let data = try? encoder.encode(self) else { return [:] }
