@@ -29,7 +29,7 @@ extension URLRequest {
         curlCommand = curlCommand.appendingFormat(" -X %@ \\\n", httpMethod)
         
         // Headers
-        let allHeadersFields = allHTTPHeaderFields!
+        let allHeadersFields = allHTTPHeaderFields ?? [:]
         let allHeadersKeys = Array(allHeadersFields.keys)
         let sortedHeadersKeys  = allHeadersKeys.sorted(by: <)
         for key in sortedHeadersKeys {
